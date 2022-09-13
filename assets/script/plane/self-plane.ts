@@ -1,6 +1,7 @@
 
 
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, Collider, ITriggerEvent } from 'cc';
+import { Constant } from '../framework/constants';
 const { ccclass, property } = _decorator;
 
 /**
@@ -15,9 +16,16 @@ export class SelfPlane extends Component {
 
     }
 
-    start() {
-
+    onEnable(){
+        const collider = this.getComponent(Collider)
+        collider.on("onTriggerEnter", this._onTriggerEnter, this) 
     }
+
+    onDisable() {
+        const collider = this.getComponent(Collider)
+        collider.off("onTriggerEnter", this._onTriggerEnter, this)
+    }
+
 
     update(dt: number) {
 
@@ -25,5 +33,12 @@ export class SelfPlane extends Component {
 
     onDestroy() {
 
+    }
+
+    private _onTriggerEnter(event: ITriggerEvent) {
+        const group = event.otherCollider.getGroup()
+        if(group === Constant.CollisionType.ENEMY_PLANE || group === Constant.CollisionType.ENEMY_BULLET){
+            console.log("reduce blood")
+        }
     }
 }

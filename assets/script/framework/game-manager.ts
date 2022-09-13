@@ -1,6 +1,6 @@
 
 
-import { _decorator, Component, Node, Prefab, instantiate,math, Vec3  } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate,math, Vec3, BoxCollider, Collider  } from 'cc';
 import { Bullet } from '../bullet/bullet';
 import { EnemyPlane } from '../plane/enemy-plane';
 import { Constant } from './constants';
@@ -138,6 +138,7 @@ export class GameManager extends Component {
 
         const bulletComp = bullet.getComponent(Bullet)
         bulletComp.show(this.bulletSpped, false)
+
     } 
 
     createEnemyBullet(pos: Vec3) {
@@ -147,6 +148,10 @@ export class GameManager extends Component {
 
         const bulletComp = bullet.getComponent(Bullet)
         bulletComp.show(this.bulletSpped, true)
+
+        const colliderComp = bullet.getComponent(BoxCollider)
+        colliderComp.setGroup(Constant.CollisionType.ENEMY_BULLET)
+        colliderComp.setMask(Constant.CollisionType.SELF_PLANE)
     } 
 
     public shoot(v: boolean) {
@@ -182,7 +187,7 @@ export class GameManager extends Component {
             plane.setParent(this.node)
             plane.setPosition(-20 + i*10, 0, ENEMY_PLANE_POS_Z)
             const comp = plane.getComponent(EnemyPlane)
-            comp.show(this.enemy1Speed)
+            comp.show(this.enemy1Speed, false, this)
         }
     }
 
@@ -193,8 +198,12 @@ export class GameManager extends Component {
             plane.setParent(this.node)
             plane.setPosition(-21 + i*7, 0, z[i])
             const comp = plane.getComponent(EnemyPlane)
-            comp.show(this.enemy2Speed)
+            comp.show(this.enemy2Speed,  false, this)
         }
+    }
+
+    addScore() {
+
     }
 
     changePlaneMode() {
