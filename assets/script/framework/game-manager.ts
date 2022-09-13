@@ -1,7 +1,8 @@
 
 
-import { _decorator, Component, Node, Prefab, instantiate,math, Vec3, BoxCollider, Collider  } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate,math, Vec3, BoxCollider, Collider, macro  } from 'cc';
 import { Bullet } from '../bullet/bullet';
+import { BulletProp } from '../bullet/bullet-prop';
 import { EnemyPlane } from '../plane/enemy-plane';
 import { Constant } from './constants';
 const { ccclass, property } = _decorator;
@@ -50,6 +51,16 @@ export class GameManager extends Component {
     @property
     createEnemyTime = 1
 
+    @property(Prefab)
+    bulletPropM: Prefab
+    @property(Prefab)
+    bulletPropH: Prefab
+    @property(Prefab)
+    bulletPropS: Prefab
+    
+    @property
+    bulletPropSpeed = 9
+
 
 
     @property(Node)
@@ -67,6 +78,7 @@ export class GameManager extends Component {
 
     private _curCreateEnemyTime = 0 
     private _combinationPlan = Constant.Combination.PLAN1;
+    private _bulletType = Constant.BulletPropType.BULLET_M
 
 
 
@@ -130,6 +142,18 @@ export class GameManager extends Component {
     }
 
     createPlayerBullet() {
+        console.log("createPlayerBullet", this._bulletType)
+        if(this._bulletType == Constant.BulletPropType.BULLET_H){
+            this.createPlayerBulletH()
+        } else if(this._bulletType == Constant.BulletPropType.BULLET_S) {
+            this.createPlayerBulletS()
+        } else {
+            this.createPlayerBulletM()
+        }
+
+    } 
+
+    createPlayerBulletM() {
         const bullet = instantiate(this.bullet01)
         bullet.setParent(this.bulletRoot)
 
@@ -138,7 +162,49 @@ export class GameManager extends Component {
 
         const bulletComp = bullet.getComponent(Bullet)
         bulletComp.show(this.bulletSpped, false)
+    } 
 
+    createPlayerBulletH() {
+        const pos = this.playerPlane.position
+
+        //left 
+        const bullet1 = instantiate(this.bullet03)
+        bullet1.setParent(this.bulletRoot)
+        bullet1.setPosition(pos.x - 2.5, pos.y, pos.z -7)
+        const bulletComp1 = bullet1.getComponent(Bullet)
+        bulletComp1.show(this.bulletSpped, false)
+
+        //right
+        const bullet2 = instantiate(this.bullet03)
+        bullet2.setParent(this.bulletRoot)
+        bullet2.setPosition(pos.x + 2.5, pos.y, pos.z -7)
+        const bulletComp2 = bullet2.getComponent(Bullet)
+        bulletComp2.show(this.bulletSpped, false)
+    } 
+
+    createPlayerBulletS() {
+        const pos = this.playerPlane.position
+
+        //middle
+        const bullet = instantiate(this.bullet05)
+        bullet.setParent(this.bulletRoot)
+        bullet.setPosition(pos.x, pos.y, pos.z -7)
+        const bulletComp = bullet.getComponent(Bullet)
+        bulletComp.show(this.bulletSpped, false)
+
+        //left 
+        const bullet1 = instantiate(this.bullet05)
+        bullet1.setParent(this.bulletRoot)
+        bullet1.setPosition(pos.x - 4, pos.y, pos.z -7)
+        const bulletComp1 = bullet1.getComponent(Bullet)
+        bulletComp1.show(this.bulletSpped, false, Constant.Direction.LEFT)
+
+        //right
+        const bullet2 = instantiate(this.bullet05)
+        bullet2.setParent(this.bulletRoot)
+        bullet2.setPosition(pos.x + 4, pos.y, pos.z -7)
+        const bulletComp2 = bullet2.getComponent(Bullet)
+        bulletComp2.show(this.bulletSpped, false, Constant.Direction.RIGHT)
     } 
 
     createEnemyBullet(pos: Vec3) {
@@ -202,16 +268,44 @@ export class GameManager extends Component {
         }
     }
 
+    createBulletProp() {
+        const prop = math.randomRangeInt(1,4)
+        let prefab: Prefab = null 
+        if(prop === Constant.BulletPropType.BULLET_H) {
+            prefab = this.bulletPropH
+        }else if(prop === Constant.BulletPropType.BULLET_S) {
+            prefab = this.bulletPropS
+        }else {
+            prefab = this.bulletPropM
+        }
+        const bulletProp = instantiate(prefab)
+        bulletProp.setParent(this.node)
+        bulletProp.setPosition(15, 0, -50)
+        const comp = bulletProp.getComponent(BulletProp)
+        comp.show(this.bulletPropSpeed, this)
+    }
+
     addScore() {
 
     }
 
+    changeBulletType(type: number) {
+        console.log("changeBulletType", this._bulletType)
+        this._bulletType = type
+        console.log("changeBulletType", this._bulletType)
+    }
+
     changePlaneMode() {
-        this.schedule(this._modeChanged, 10, 1)
+        this.schedule(this._modeChanged, 10, macro.REPEAT_FOREVER)
     }
 
     private _modeChanged() {
         console.log("_modeChanged", this)
         this._combinationPlan++
+        if(this._combinationPlan > 3) {
+            this._combinationPlan = 1
+        }
+
+        this.createBulletProp()
     }
 }

@@ -778,6 +778,19 @@
     "enemy1Speed": 15,
     "enemy2Speed": 21,
     "createEnemyTime": 1,
+    "bulletPropM": {
+      "__uuid__": "5c0054e1-761f-48e9-8e8e-39cbe2d8c712",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropH": {
+      "__uuid__": "2e5de0f8-1c65-42d5-973f-d5525a76c0de",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropS": {
+      "__uuid__": "979f4b0c-a424-4d73-bc00-5eb50ac6a5d7",
+      "__expectedType__": "cc.Prefab"
+    },
+    "bulletPropSpeed": 9,
     "playerPlane": {
       "__id__": 12
     },

@@ -1,6 +1,7 @@
 
 
 import { _decorator, Component, Node, Collider, ITriggerEvent } from 'cc';
+import { Constant } from '../framework/constants';
 const { ccclass, property } = _decorator;
 
 const BULLETRANGE = -100
@@ -17,6 +18,8 @@ export class Bullet extends Component {
     private _bulletSpped = 10
 
     private _isEnemy = false
+
+    private _direction = Constant.Direction.MIDDLE
 
 
 
@@ -48,7 +51,14 @@ export class Bullet extends Component {
                 this.node.destroy()
             }
         }else {
-            this.node.setPosition(pos.x, pos.y, pos.z - delta)
+            if(this._direction === Constant.Direction.LEFT){
+                this.node.setPosition(pos.x - delta*0.3, pos.y, pos.z - delta)
+            } else if(this._direction === Constant.Direction.RIGHT) {
+                this.node.setPosition(pos.x + delta*0.3, pos.y, pos.z - delta)
+            } else {
+                this.node.setPosition(pos.x, pos.y, pos.z - delta)
+            }
+
 
             if(this.node.position.z < BULLETRANGE) {
                 this.node.removeFromParent()
@@ -58,9 +68,11 @@ export class Bullet extends Component {
 
     }
 
-    show(speed: number, isEnemy: boolean) {
+    show(speed: number, isEnemy: boolean, direction: number = Constant.Direction.MIDDLE) {
         this._bulletSpped = speed
         this._isEnemy = isEnemy
+
+        this._direction = direction
     }
 
     private _onTriggerEnter(event: ITriggerEvent) {
