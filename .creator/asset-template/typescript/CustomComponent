@@ -1,0 +1,29 @@
+
+
+import { _decorator, Component, Node } from 'cc';
+const { ccclass, property } = _decorator;
+
+/**
+ * 
+ * Author <%Author%>
+ * <%DateTime%>
+ *
+ */
+@ccclass('<%CamelCaseClassName%>')
+export class <%CamelCaseClassName%> extends Component {
+    onLoad() {
+
+    }
+
+    start() {
+
+    }
+
+    update(dt: number) {
+
+    }
+
+    onDestroy() {
+
+    }
+}
