@@ -76,6 +76,7 @@ export class EnemyPlane extends Component {
     private _onTriggerEnter(event: ITriggerEvent) {
         const group = event.otherCollider.getGroup()
         if(group === Constant.CollisionType.SELF_PLANE || group === Constant.CollisionType.SELF_BULLET){
+            this._gameManager.playEffect("enemy")
             this.node.removeFromParent()
             this.node.destroy()
             this._gameManager.addScore()

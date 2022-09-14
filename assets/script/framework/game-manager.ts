@@ -1,9 +1,11 @@
 
 
-import { _decorator, Component, Node, Prefab, instantiate,math, Vec3, BoxCollider, Collider, macro  } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate,math, Vec3, BoxCollider,  macro, Label, Animation  } from 'cc';
 import { Bullet } from '../bullet/bullet';
 import { BulletProp } from '../bullet/bullet-prop';
 import { EnemyPlane } from '../plane/enemy-plane';
+import { SelfPlane } from '../plane/self-plane';
+import { AudioManager } from './audio-manager';
 import { Constant } from './constants';
 const { ccclass, property } = _decorator;
 
@@ -63,14 +65,35 @@ export class GameManager extends Component {
 
 
 
-    @property(Node)
-    playerPlane: Node
+    @property(SelfPlane)
+    playerPlane: SelfPlane
 
     @property
     shootTime = 0.1
 
     @property
     bulletSpped:number = 10
+
+    @property(Node) 
+    gamePage: Node = null 
+
+    @property(Node) 
+    gameOverPage: Node = null 
+
+    @property(Label)
+    gameScore: Label = null 
+
+    @property(Label)
+    gameOverScore: Label = null 
+
+    @property(Animation)
+    overAnim: Animation = null 
+
+    //audio 
+    @property(AudioManager)
+    audioEffect: AudioManager = null 
+
+    isGameStart: boolean = false
 
     private _currShootTime = 0 
     private _isShooting = false
@@ -79,14 +102,24 @@ export class GameManager extends Component {
     private _curCreateEnemyTime = 0 
     private _combinationPlan = Constant.Combination.PLAN1;
     private _bulletType = Constant.BulletPropType.BULLET_M
+    private _score = 0 
 
 
 
     start() {
-        this._init()
+        this.gameReset()
     }
 
     update(dt: number) {
+        if(!this.isGameStart){
+            return 
+        }
+
+        if(this.playerPlane.isDie){
+            this.gameOver()
+            return 
+        }
+
         this._currShootTime += dt
         if(this._isShooting && this._currShootTime > this.shootTime) {
             this.createPlayerBullet()
@@ -136,13 +169,9 @@ export class GameManager extends Component {
 
     }
 
-    _init() {
-        this._currShootTime = this.shootTime  
-        this.changePlaneMode()
-    }
-
     createPlayerBullet() {
         console.log("createPlayerBullet", this._bulletType)
+        this.playEffect("bullet1")
         if(this._bulletType == Constant.BulletPropType.BULLET_H){
             this.createPlayerBulletH()
         } else if(this._bulletType == Constant.BulletPropType.BULLET_S) {
@@ -157,7 +186,7 @@ export class GameManager extends Component {
         const bullet = instantiate(this.bullet01)
         bullet.setParent(this.bulletRoot)
 
-        const pos = this.playerPlane.position
+        const pos = this.playerPlane.node.position
         bullet.setPosition(pos.x, pos.y, pos.z -7)
 
         const bulletComp = bullet.getComponent(Bullet)
@@ -165,7 +194,7 @@ export class GameManager extends Component {
     } 
 
     createPlayerBulletH() {
-        const pos = this.playerPlane.position
+        const pos = this.playerPlane.node.position
 
         //left 
         const bullet1 = instantiate(this.bullet03)
@@ -183,7 +212,7 @@ export class GameManager extends Component {
     } 
 
     createPlayerBulletS() {
-        const pos = this.playerPlane.position
+        const pos = this.playerPlane.node.position
 
         //middle
         const bullet = instantiate(this.bullet05)
@@ -285,8 +314,46 @@ export class GameManager extends Component {
         comp.show(this.bulletPropSpeed, this)
     }
 
-    addScore() {
+    gameReset() {
+        this._currShootTime = 0
+        this._curCreateEnemyTime = 0 
+        this._combinationPlan = Constant.Combination.PLAN1
+        this._bulletType = Constant.BulletPropType.BULLET_M 
+        this.playerPlane.node.setPosition(0,0, 15)
 
+    }
+
+    gameStart() {
+        this.isGameStart = true 
+        this._currShootTime = this.shootTime  
+        this.changePlaneMode()
+
+        this._score = 0 
+        this.gameScore.string = this._score.toString()
+        this.playerPlane.init()
+    }
+
+    gameReStart() {  
+        this.gameReset()
+        this.gameStart()
+    }
+
+    returnMain() {
+        this.gameReset()
+    }
+
+    gameOver() {
+        this.isGameStart = false 
+        this.gamePage.active = false 
+        this.gameOverPage.active = true
+        this.gameOverScore.string = this._score.toString()
+        this._isShooting = false
+        this.unschedule(this._modeChanged)
+        this.overAnim.play()
+    }
+    addScore() {
+        this._score++
+        this.gameScore.string = this._score.toString()
     }
 
     changeBulletType(type: number) {
@@ -307,5 +374,9 @@ export class GameManager extends Component {
         }
 
         this.createBulletProp()
+    }
+
+    playEffect(name: string) {
+        this.audioEffect.play(name)
     }
 }
