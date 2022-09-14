@@ -51,9 +51,12 @@ export class SelfPlane extends Component {
     }
 
     private _onTriggerEnter(event: ITriggerEvent) {
+        if(this.isDie){
+            return 
+        }
         const group = event.otherCollider.getGroup()
         if(group === Constant.CollisionType.ENEMY_PLANE || group === Constant.CollisionType.ENEMY_BULLET){
-            // console.log("reduce blood")
+            console.log("reduce blood")
             this._curLife-- 
             if(this._curLife <= 0) {
                 this.isDie = true

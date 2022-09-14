@@ -2,6 +2,7 @@
 
 import { _decorator, Component, Node, Collider, ITriggerEvent } from 'cc';
 import { Constant } from '../framework/constants';
+import { PoolManager } from '../framework/pool-manager';
 const { ccclass, property } = _decorator;
 
 const BULLETRANGE = -100
@@ -47,8 +48,7 @@ export class Bullet extends Component {
         if(this._isEnemy) {
             this.node.setPosition(pos.x, pos.y, pos.z + delta)
             if(this.node.position.z > -BULLETRANGE) {
-                this.node.removeFromParent()
-                this.node.destroy()
+                PoolManager.instance().putNode(this.node)
             }
         }else {
             if(this._direction === Constant.Direction.LEFT){
@@ -61,8 +61,7 @@ export class Bullet extends Component {
 
 
             if(this.node.position.z < BULLETRANGE) {
-                this.node.removeFromParent()
-                this.node.destroy()
+                PoolManager.instance().putNode(this.node)
             }
         }
 
@@ -76,8 +75,7 @@ export class Bullet extends Component {
     }
 
     private _onTriggerEnter(event: ITriggerEvent) {
-        this.node.removeFromParent()
-        this.node.destroy()
+        PoolManager.instance().putNode(this.node)
     }
 
     onDestroy() {

@@ -3,6 +3,7 @@
 import { _decorator, Component, Node, Collider, ITriggerEvent } from 'cc';
 import { Constant } from '../framework/constants';
 import { GameManager } from '../framework/game-manager';
+import { PoolManager } from '../framework/pool-manager';
 const { ccclass, property } = _decorator;
 
 const OUT_OF_BOUNCE = 50 
@@ -47,8 +48,7 @@ export class EnemyPlane extends Component {
         const z = pos.z + this._speed*dt 
         this.node.setPosition(pos.x, pos.y, z)
         if(z > OUT_OF_BOUNCE) {
-            this.node.removeFromParent()
-            this.node.destroy()
+            PoolManager.instance().putNode(this.node)
         }
 
         if(this._needBullet){
@@ -77,8 +77,7 @@ export class EnemyPlane extends Component {
         const group = event.otherCollider.getGroup()
         if(group === Constant.CollisionType.SELF_PLANE || group === Constant.CollisionType.SELF_BULLET){
             this._gameManager.playEffect("enemy")
-            this.node.removeFromParent()
-            this.node.destroy()
+            PoolManager.instance().putNode(this.node)
             this._gameManager.addScore()
         }
     }
