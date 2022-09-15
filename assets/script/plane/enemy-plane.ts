@@ -77,6 +77,7 @@ export class EnemyPlane extends Component {
         const group = event.otherCollider.getGroup()
         if(group === Constant.CollisionType.SELF_PLANE || group === Constant.CollisionType.SELF_BULLET){
             this._gameManager.playEffect("enemy")
+            this._gameManager.createEnemyExplode(this.node.position)
             PoolManager.instance().putNode(this.node)
             this._gameManager.addScore()
         }

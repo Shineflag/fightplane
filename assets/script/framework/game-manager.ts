@@ -94,6 +94,9 @@ export class GameManager extends Component {
     @property(AudioManager)
     audioEffect: AudioManager = null 
 
+    @property(Prefab)
+    enemyExplode: Prefab = null 
+
     isGameStart: boolean = false
 
     private _currShootTime = 0 
@@ -246,6 +249,12 @@ export class GameManager extends Component {
 
     public shoot(v: boolean) {
         this._isShooting = v
+    }
+
+    createEnemyExplode(pos: Vec3) {
+        const explode = PoolManager.instance().getNode(this.enemyExplode,this.node) 
+        explode.setPosition(pos)
+
     }
 
     createEnemhyPlane() {

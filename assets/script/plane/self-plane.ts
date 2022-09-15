@@ -19,12 +19,20 @@ export class SelfPlane extends Component {
 
     private _audioSource: AudioSource = null 
 
+    @property(Node)
+    explode: Node = null 
+
+    @property(Node)
+    blood: Node = null 
+
 
 
     //初始化
     init() {
         this._curLife = this.lifeValue
         this.isDie = false
+        this.explode.active = false
+        this.blood.setScale(1,1,1)
     }
 
     onLoad() {
@@ -58,9 +66,11 @@ export class SelfPlane extends Component {
         if(group === Constant.CollisionType.ENEMY_PLANE || group === Constant.CollisionType.ENEMY_BULLET){
             console.log("reduce blood")
             this._curLife-- 
+            this.blood.setScale(this._curLife/this.lifeValue,1,1)
             if(this._curLife <= 0) {
                 this.isDie = true
                 this._audioSource.play()
+                this.explode.active = true
             }
         }
     }
